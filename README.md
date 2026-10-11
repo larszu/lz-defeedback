@@ -53,6 +53,10 @@ Ergebnisse liegen in `build/LZDefeedback_artefacts/Release/` (VST3, AU, Standalo
 
 Grenze: Ein lang gehaltener, obertonarmer Sinuston ohne Vibrato ist spektral nicht von Rückkopplung zu unterscheiden.
 
+## Weiter
+
+Offene Aufgaben und Plan (Praxistest, Windows-Build, eigenes neuronales Netz): [docs/ROADMAP.md](docs/ROADMAP.md)
+
 ## Lizenz
 
 Eigener Code: © Lars Zumpe Medienproduktion. JUCE 8 steht unter AGPLv3 oder einer kommerziellen JUCE-Lizenz – vor einer Weitergabe der Binärdateien die passende Lizenz klären.
