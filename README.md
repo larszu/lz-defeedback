@@ -49,7 +49,7 @@ Ergebnisse liegen in `build/LZDefeedback_artefacts/Release/` (VST3, AU, Standalo
 - Ohne Plugin schaukelt sich die Schleife bis in die Begrenzung auf; mit Plugin bleibt sie auf Quellpegel.
 - Reaktion nach 0,25–0,4 s, auch bei langsam wachsender Rückkopplung und laufender Musik.
 - Kein Filter bei Rauschen; bitgleicher Ausgang im Ruhezustand.
-- Keine Fehlauslösung bei Musik und lang gehaltenen Tönen (mit und ohne Vibrato).
+- Kaum Fehlauslösungen bei Musik und lang gehaltenen Tönen: höchstens ein Filter (−9 dB) bei Gesang mit Vibrato, sonst keiner.
 
 Grenze: Ein lang gehaltener, obertonarmer Sinuston ohne Vibrato ist spektral nicht von Rückkopplung zu unterscheiden.
 
