@@ -4,6 +4,31 @@ Rückkopplungsunterdrückung als Plugin (VST3, AU, Standalone) für Live-Beschal
 
 LZ Defeedback findet Rückkopplungen und setzt schmale Kerbfilter (Notches) genau auf ihre Frequenz. Das Signal läuft dabei **ohne zusätzliche Latenz** durch – solange nichts koppelt, ist der Ausgang bitgleich mit dem Eingang.
 
+## Download
+
+Fertige Dateien für macOS (Universal) und Windows (x64) hängen am jeweiligen [Release](https://github.com/larszu/lz-defeedback/releases/latest): VST3, AU (nur Mac) und Standalone. Installation: [docs/INSTALL.md](docs/INSTALL.md).
+
+## Systemvoraussetzungen
+
+| | Mindestens | Empfohlen |
+|---|---|---|
+| Betriebssystem | macOS 11 oder Windows 10, jeweils 64 Bit | aktuelles macOS bzw. Windows 11 |
+| Prozessor | Apple Silicon oder Intel/AMD x64 mit SSE2 (Windows auf ARM wird nicht gebaut) | ab Apple M1 bzw. Intel Core i5 / AMD Ryzen 5 der letzten Jahre |
+| Arbeitsspeicher | 4 GB | 8 GB |
+| Host | DAW oder Live-Host mit VST3 oder AU – oder die Standalone-App | Live-Host mit festem Puffer (z. B. Gig Performer, Reaper, Ableton Live) |
+| Kanäle | Mono oder Stereo, Ein- gleich Ausgang | – |
+| Abtastrate | 44,1–192 kHz | 48 kHz |
+
+Der Rechenaufwand ist gering: je Kanal 24 Biquads im Signalweg und eine FFT mit 4096 Punkten alle 512 Samples. Ein Wert für die CPU-Last an echter Hardware ist noch nicht gemessen.
+
+### Hardware-Empfehlung für den Live-Einsatz
+
+- **Audio-Interface mit stabilem Treiber:** Core Audio (Mac) bzw. ASIO (Windows; nicht den generischen Windows-Treiber). Puffer 64–128 Samples bei 48 kHz halten die Wandler- und Pufferlatenz unter etwa 5 ms – das Plugin selbst fügt keine hinzu.
+- **Einschleifen:** als Insert auf dem Mikrofonkanal oder auf dem Monitor-/PA-Weg, hinter EQ und Dynamik. Je Monitorweg eine eigene Instanz.
+- **Digitalpult mit Rechneranbindung** (z. B. über USB-, Dante- oder MADI-Karte) erlaubt das Einschleifen in einzelne Wege ohne zusätzliche Wandlung.
+- **Zum Einmessen:** Messmikrofon und ein RTA zum Gegenprüfen der gefundenen Frequenzen sind hilfreich, aber nicht nötig.
+- **Stromsparmodus aus**, WLAN und Bluetooth während der Veranstaltung möglichst aus – Aussetzer im Audiotreiber sind im Live-Betrieb gefährlicher als die Rückkopplung selbst.
+
 ## Funktionsweise
 
 - **Signalweg:** bis zu 24 schmale Glockenfilter mit Absenkung (Biquads, doppelte Genauigkeit). Inaktive Filter werden übersprungen.
@@ -42,6 +67,8 @@ ctest --test-dir build --output-on-failure
 
 Ergebnisse liegen in `build/LZDefeedback_artefacts/Release/` (VST3, AU, Standalone).
 
+Release: Tag `v*` pushen – `.github/workflows/release.yml` baut auf macOS (Universal) und Windows, führt die Tests und `auval` aus und hängt die ZIPs ans Release.
+
 ## Tests
 
 `tests/sim_test.cpp` simuliert eine geschlossene Schleife: Quelle → Mikrofon → Plugin → Lautsprecher mit Sättigung → Raum mit Resonanzen und 7 ms Laufzeit → Mikrofon. Geprüft wird bei 11,025 / 48 / 96 / 192 kHz:
@@ -55,7 +82,7 @@ Grenze: Ein lang gehaltener, obertonarmer Sinuston ohne Vibrato ist spektral nic
 
 ## Weiter
 
-Offene Aufgaben und Plan (Praxistest, Windows-Build, eigenes neuronales Netz): [docs/ROADMAP.md](docs/ROADMAP.md)
+Offene Aufgaben und Plan (Praxistest, Signierung, eigenes neuronales Netz): [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ## Lizenz
 

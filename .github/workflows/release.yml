@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            name: macOS
+          - os: windows-latest
+            name: Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Version aus Tag
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"; else V="0.0.0-dev"; fi
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+
+      - name: MSVC-Umgebung
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Konfigurieren
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
+          else
+            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          fi
+
+      - name: Bauen
+        run: cmake --build build --config Release
+
+      - name: Tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: auval (AU-Prüfung)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "build/LZDefeedback_artefacts/Release/AU/LZ Defeedback.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar || true
+          auval -v aufx Lzdf Lzmp
+
+      - name: Paketieren (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          A=build/LZDefeedback_artefacts/Release
+          mkdir -p out
+          # Ad-hoc signieren, damit Apple Silicon die Bundles lädt
+          for b in "$A/VST3/LZ Defeedback.vst3" "$A/AU/LZ Defeedback.component" "$A/Standalone/LZ Defeedback.app"; do
+            codesign --force --deep -s - "$b"
+          done
+          (cd "$A/VST3" && ditto -c -k --keepParent "LZ Defeedback.vst3" "$GITHUB_WORKSPACE/out/LZ-Defeedback-$VERSION-mac-VST3.zip")
+          S=$(mktemp -d)/pkg
+          mkdir -p "$S"
+          cp -R "$A/VST3/LZ Defeedback.vst3" "$A/AU/LZ Defeedback.component" "$A/Standalone/LZ Defeedback.app" "$S/"
+          cp docs/INSTALL.md "$S/LIESMICH.md"
+          ditto -c -k --keepParent "$S" "out/LZ-Defeedback-$VERSION-mac-universal.zip"
+          ls -la out
+
+      - name: Paketieren (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $A = "build/LZDefeedback_artefacts/Release"
+          New-Item -ItemType Directory -Force out, pkg | Out-Null
+          Compress-Archive -Path "$A/VST3/LZ Defeedback.vst3" -DestinationPath "out/LZ-Defeedback-$env:VERSION-win-x64-VST3.zip"
+          Copy-Item -Recurse "$A/VST3/LZ Defeedback.vst3" pkg/
+          Copy-Item "$A/Standalone/LZ Defeedback.exe" pkg/
+          Copy-Item docs/INSTALL.md pkg/LIESMICH.md
+          Compress-Archive -Path pkg/* -DestinationPath "out/LZ-Defeedback-$env:VERSION-win-x64.zip"
+          Get-ChildItem out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: out/*
+          retention-days: 3
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Release anlegen bzw. ergänzen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "LZ Defeedback ${TAG#v}" --notes-file docs/RELEASE_NOTES.md
+          gh release upload "$TAG" dist/* --clobber

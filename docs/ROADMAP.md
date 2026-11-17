@@ -1,6 +1,6 @@
 # Roadmap & offene Aufgaben
 
-Stand: 11.10.2026 – Version 0.1.0 (Regelbasierte Erkennung, nur simuliert geprüft)
+Stand: 17.11.2026 – Version 0.1.0 (Regelbasierte Erkennung, nur simuliert geprüft; Release für macOS und Windows)
 
 ## Erledigt
 
@@ -19,11 +19,11 @@ Bisher ist nichts an Mikrofon und PA geprüft.
 - [ ] Reaktionszeit und Klangverfärbung bei Max. Tiefe −24 dB und Breite 1/10 okt beurteilen
 - [ ] Aufnahmen (Mikrofonsignal, 48 kHz WAV) von echten Rückkopplungen **und** von unkritischem Material sichern → Trainings- und Testdaten für Abschnitt 3
 
-## 2. Windows-Build
+## 2. Windows-Build und Release
 
-- [ ] GitHub-Actions-Workflow für Windows (VST3 + Standalone, MSVC 2022) und macOS (Universal Binary arm64/x86_64)
-- Achtung: Repo ist privat, Actions-Minuten kosten Geld. Workflow nur bei v-Tags laufen lassen, nicht bei jedem Push.
-- [ ] Release per v-Tag, Installer/ZIP an den Release hängen
+- [x] GitHub-Actions-Workflow für Windows (VST3 + Standalone, MSVC) und macOS (Universal Binary arm64/x86_64), nur bei v-Tags
+- [x] Release per v-Tag, ZIPs an den Release
+- [ ] Installer (pkg / Inno Setup) statt ZIP
 - [ ] macOS: Signieren und Notarisieren (Developer-ID nötig)
 
 ## 3. Eigenes neuronales Netz (Klassifikator)
