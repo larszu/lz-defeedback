@@ -67,7 +67,7 @@ jobs:
             codesign --force --deep -s - "$b"
           done
           (cd "$A/VST3" && ditto -c -k --keepParent "LZ Defeedback.vst3" "$GITHUB_WORKSPACE/out/LZ-Defeedback-$VERSION-mac-VST3.zip")
-          S=$(mktemp -d)/pkg
+          S="$(mktemp -d)/LZ Defeedback $VERSION"
           mkdir -p "$S"
           cp -R "$A/VST3/LZ Defeedback.vst3" "$A/AU/LZ Defeedback.component" "$A/Standalone/LZ Defeedback.app" "$S/"
           cp docs/INSTALL.md "$S/LIESMICH.md"
@@ -79,12 +79,12 @@ jobs:
         shell: pwsh
         run: |
           $A = "build/LZDefeedback_artefacts/Release"
-          New-Item -ItemType Directory -Force out, pkg | Out-Null
+          $P = "LZ Defeedback $env:VERSION"; New-Item -ItemType Directory -Force out, $P | Out-Null
           Compress-Archive -Path "$A/VST3/LZ Defeedback.vst3" -DestinationPath "out/LZ-Defeedback-$env:VERSION-win-x64-VST3.zip"
-          Copy-Item -Recurse "$A/VST3/LZ Defeedback.vst3" pkg/
-          Copy-Item "$A/Standalone/LZ Defeedback.exe" pkg/
-          Copy-Item docs/INSTALL.md pkg/LIESMICH.md
-          Compress-Archive -Path pkg/* -DestinationPath "out/LZ-Defeedback-$env:VERSION-win-x64.zip"
+          Copy-Item -Recurse "$A/VST3/LZ Defeedback.vst3" $P
+          Copy-Item "$A/Standalone/LZ Defeedback.exe" $P
+          Copy-Item docs/INSTALL.md "$P/LIESMICH.md"
+          Compress-Archive -Path $P -DestinationPath "out/LZ-Defeedback-$env:VERSION-win-x64.zip"
           Get-ChildItem out
 
       - uses: actions/upload-artifact@v4
