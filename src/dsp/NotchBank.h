@@ -2,6 +2,8 @@
 
 #include <array>
 #include <atomic>
+#include "Constants.h"
+
 #include <cmath>
 #include <complex>
 #include <vector>
@@ -135,7 +137,7 @@ public:
     void updateCoefficients (Slot& s) const noexcept
     {
         const double A = std::pow (10.0, s.currentDb / 40.0);
-        const double w0 = 2.0 * M_PI * s.freq / fs;
+        const double w0 = 2.0 * lzdf::kPi * s.freq / fs;
         const double sw = std::sin (w0), cw = std::cos (w0);
         // bandwidth in octaves -> alpha (RBJ)
         const double alpha = sw * std::sinh (std::log (2.0) / 2.0 * widthOct * w0 / sw);
@@ -150,7 +152,7 @@ public:
 private:
     double magnitudeDb (const Slot& s, double f) const noexcept
     {
-        const double w = 2.0 * M_PI * f / fs;
+        const double w = 2.0 * lzdf::kPi * f / fs;
         const std::complex<double> z1 = std::polar (1.0, -w), z2 = std::polar (1.0, -2.0 * w);
         const auto num = s.b0 + s.b1 * z1 + s.b2 * z2;
         const auto den = 1.0 + s.a1 * z1 + s.a2 * z2;

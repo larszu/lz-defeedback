@@ -31,7 +31,7 @@ struct Biquad
     static Biquad bandpass (double f, double q)
     {
         Biquad b;
-        const double w = 2 * M_PI * f / fs, al = std::sin (w) / (2 * q), a0 = 1 + al;
+        const double w = 2 * lzdf::kPi * f / fs, al = std::sin (w) / (2 * q), a0 = 1 + al;
         b.b0 = al / a0; b.b1 = 0; b.b2 = -al / a0; b.a1 = -2 * std::cos (w) / a0; b.a2 = (1 - al) / a0;
         return b;
     }
@@ -87,11 +87,11 @@ struct Music
         }
         const double nt = t - noteStart;
         const double env = std::min (1.0, nt / 0.02) * std::exp (-nt / sustainTau);
-        const double vib = nt > 0.15 ? 1.0 + vibratoDepth * std::sin (2 * M_PI * 5.5 * nt) : 1.0;
+        const double vib = nt > 0.15 ? 1.0 + vibratoDepth * std::sin (2 * lzdf::kPi * 5.5 * nt) : 1.0;
         double s = 0;
         for (int h = 1; h <= 6; ++h)
         {
-            phase[h - 1] += 2 * M_PI * f0 * h * vib / fs;
+            phase[h - 1] += 2 * lzdf::kPi * f0 * h * vib / fs;
             s += std::sin (phase[h - 1]) / h;
         }
         return level * env * s;

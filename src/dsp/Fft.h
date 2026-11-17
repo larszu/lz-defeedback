@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Constants.h"
+
 #include <cmath>
 #include <complex>
 #include <vector>
@@ -33,7 +35,7 @@ public:
         twiddle.resize ((size_t) n / 2);
         for (int i = 0; i < n / 2; ++i)
         {
-            const double a = -2.0 * M_PI * i / n;
+            const double a = -2.0 * lzdf::kPi * i / n;
             twiddle[(size_t) i] = { (float) std::cos (a), (float) std::sin (a) };
         }
     }

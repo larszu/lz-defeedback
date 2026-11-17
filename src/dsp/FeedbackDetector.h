@@ -50,7 +50,7 @@ public:
         powerDb.assign ((size_t) n / 2 + 1, -200.0f);
         window.resize ((size_t) n);
         for (int i = 0; i < n; ++i)
-            window[(size_t) i] = (float) (0.5 - 0.5 * std::cos (2.0 * M_PI * i / n));
+            window[(size_t) i] = (float) (0.5 - 0.5 * std::cos (2.0 * lzdf::kPi * i / n));
         binHz = fs / n;
         kLow = (int) std::ceil (60.0 / binHz);
         kHigh = (int) std::floor (std::min (16000.0, 0.45 * fs) / binHz);

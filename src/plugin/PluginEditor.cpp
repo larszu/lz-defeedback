@@ -161,9 +161,9 @@ void SpectrumView::paint (juce::Graphics& g)
             if (d > -0.01)
                 continue;
             const double nf = n.freq.load (std::memory_order_relaxed);
-            const double A = std::pow (10.0, d / 40.0), w0 = 2.0 * M_PI * nf / fs;
+            const double A = std::pow (10.0, d / 40.0), w0 = 2.0 * lzdf::kPi * nf / fs;
             const double alpha = std::sin (w0) * std::sinh (std::log (2.0) / 2.0 * widthOct * w0 / std::sin (w0));
-            const double w = 2.0 * M_PI * f / fs;
+            const double w = 2.0 * lzdf::kPi * f / fs;
             const std::complex<double> z1 = std::polar (1.0, -w), z2 = std::polar (1.0, -2.0 * w);
             const auto num = (1.0 + alpha * A) + (-2.0 * std::cos (w0)) * z1 + (1.0 - alpha * A) * z2;
             const auto den = (1.0 + alpha / A) + (-2.0 * std::cos (w0)) * z1 + (1.0 - alpha / A) * z2;
